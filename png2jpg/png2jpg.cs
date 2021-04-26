@@ -35,6 +35,12 @@ namespace Hammock_Console_Apps
 {
     class png2jpg
     {
+        public static Image resizeImage(Image imgToResize, Size size)
+        {
+            return (Image)(new Bitmap(imgToResize, size));
+        }
+
+
         /// <summary>
         /// Entry point of the program.
         /// </summary>
@@ -46,13 +52,14 @@ namespace Hammock_Console_Apps
             Image inp;  // An image object to handle conversion.
 
             // Use a JPEG encoder with a quality of 95%.
-            EncoderParameters jpegParams = SetJPEGParameters(95);
+            EncoderParameters jpegParams = SetJPEGParameters(int.Parse(args[1]));
+            //EncoderParameters jpegParams = SetJPEGParameters(80);
             ImageCodecInfo jpegEncoder = GetEncoder(ImageFormat.Jpeg);
 
             // Loop through each of the passed arguments to attempt batch conversion.
-            for (int i = 0; i < args.Length; ++i)
+            //for (int i = 0; i < args.Length; ++i)
             {
-                String name = args[i];  // The name of the current working png.
+                String name = args[0];  // The name of the current working png.
 
                 try
                 {
@@ -61,7 +68,7 @@ namespace Hammock_Console_Apps
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine("Error.  File " + args[i] + " not found.");
+                    Console.Error.WriteLine("Error.  File " + args[2] + " not found.");
                     Console.Error.WriteLine();
                     return;
                 }
@@ -70,6 +77,8 @@ namespace Hammock_Console_Apps
                 String allcaps = name.ToUpper();
                 name = name.Substring(0, allcaps.IndexOf(".PNG"));
                 name += ".jpg";
+
+                inp = resizeImage(inp, new Size(int.Parse(args[2]), int.Parse(args[3])));
 
                 // Save the converted image.
                 inp.Save(name, jpegEncoder, jpegParams);
@@ -88,7 +97,7 @@ namespace Hammock_Console_Apps
         /// A System.Drawing.Imaging.EncoderParameters object with the
         /// using the given quality parameter.
         /// </returns>
-        private static EncoderParameters SetJPEGParameters (long quality)
+        private static EncoderParameters SetJPEGParameters(long quality)
         {
             Encoder qualEncoder = Encoder.Quality;
             EncoderParameters ep = new EncoderParameters(1);
@@ -110,7 +119,7 @@ namespace Hammock_Console_Apps
         /// <returns>
         /// The codec of the given ImageFormat; null if an invalid type was specified.
         /// </returns>
-        private static ImageCodecInfo GetEncoder (ImageFormat format)
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
         {
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
             foreach (ImageCodecInfo codec in codecs)
